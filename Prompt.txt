@@ -1,0 +1,11 @@
+Okay I am creating a lost and found system platform where A person is able to register their lost one's identity through my platform.
+For now, I have successfully implemented the upload page, where all the descriptors and label are added in the Postgres database.
+Also, the images are uploaded to uploads/Lost person's name/ folder in local server.
+
+I want you to suggest schema for tables which are required to be created for following requirement.
+1. I want to search person by check-face, which is working nicely right now, it should fetch data of the person from the database. Like more data that a user will be adding for lost one.
+2. Search by name, city, etc., filtering features.
+3. A full-fledged ledger of people registered who are lost, with all their details.
+4. A profile section where someone can create account and manage their report, for their lost ones. This means registration and login for user who will file the complaint for their lost ones, there. This user can be a relative, this user can be also that person who found the lost person somewhere and updated the site's ledger by registering and uploading detail of this lost person.
+
+Suggest.

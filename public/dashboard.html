@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+      integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <title>Your Dashboard</title>
+  </head>
+  <body class="bg-gray-100">
+    <!-- Sidebar -->
+    <div class="flex h-screen bg-gray-200">
+      <nav class="w-64 bg-white border-r">
+        <div class="p-4">
+          <h2 class="text-xl font-semibold">Dashboard</h2>
+        </div>
+        <ul class="space-y-2 mt-4">
+          <li>
+            <a
+              href="/"
+              class="flex items-center py-2 px-4 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+            >
+              <i class="fas fa-home mr-2"></i>
+              Home
+            </a>
+          </li>
+          <li>
+            <a
+              href="/upload"
+              class="flex items-center py-2 px-4 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+            >
+              <i class="fas fa-upload mr-2"></i>
+              Upload
+            </a>
+          </li>
+          <li>
+            <a
+              href="/checkface"
+              class="flex items-center py-2 px-4 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+            >
+              <i class="fas fa-search mr-2"></i>
+              Search a Face
+            </a>
+          </li>
+          <li>
+            <a
+              href="/profile"
+              class="flex items-center py-2 px-4 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+            >
+              <i class="fas fa-user mr-2"></i>
+              Profile
+            </a>
+          </li>
+          <li>
+            <a
+              href="/profile"
+              class="flex items-center py-2 px-4 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+            >
+              <span id="account"></span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="flex-1 p-6 overflow-y-scroll">
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+          id="cards-container"
+        >
+          <!-- Cards will be dynamically generated here -->
+        </div>
+
+        <!-- Pagination controls here -->
+      </div>
+    </div>
+
+    <script>
+      // Use JavaScript to fetch and populate data
+      async function fetchDataAndPopulateCards() {
+        try {
+          const response = await fetch("/dashboardfetch"); // Replace with your server route to fetch data
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+
+          const data = await response.json();
+          const cardsContainer = document.getElementById("cards-container");
+
+          data.forEach((person) => {
+            const card = document.createElement("div");
+            card.className = "bg-white rounded-lg p-4 shadow-lg";
+            card.innerHTML = `
+            <img src="${person.image_path}${person.name}-1.jpg" alt="${
+              person.name
+            }'s Image" class="w-full h-auto mt-4">
+            <h3 class="text-xl font-semibold">${person.name}</h3>
+            <p class="text-gray-600">Created on: ${new Date(
+              person.created_at
+            ).toDateString()}</p>
+            <p class="text-gray-600" data-person-id="${
+              person.person_id
+            }">Person ID: ${person.person_id}</p>`;
+
+            cardsContainer.appendChild(card);
+          });
+        } catch (error) {
+          console.error(error);
+          // Handle errors here
+        }
+      }
+
+      // Call the function to fetch and populate data when the page loads
+      window.addEventListener("load", fetchDataAndPopulateCards);
+    </script>
+    <script src="./logincheck.js"></script>
+  </body>
+</html>

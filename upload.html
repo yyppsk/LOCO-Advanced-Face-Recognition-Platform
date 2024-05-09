@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Face Images</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="min-h-screen bg-gray-100">
+    <div id="navbar-placeholder"></div>
+    <!-- Content wrapper -->
+    <div class="grid grid-cols-1 gap-4 p-4 relative">
+      <div class="col-span-1">
+        <div class="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
+          <!-- Step 1 -->
+          <div class="mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Step 1: Upload Images</h2>
+
+            <form id="uploadForm" enctype="multipart/form-data">
+              <div class="mb-4">
+                <label
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  for="name"
+                  >Lost Person's Name
+                </label>
+
+                <input
+                  class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                  aria-describedby="user_avatar_help"
+                  type="text"
+                  id="name"
+                  name="name"
+                  placeholder="Lost Person's Name"
+                />
+                <div
+                  class="mt-1 text-sm text-gray-500 dark:text-gray-300"
+                  id="user_avatar_help"
+                >
+                  This name will be used to find the Person in our database.
+                </div>
+              </div>
+              <div class="mb-4">
+                <label
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  for="images"
+                  >Images :</label
+                >
+                <input
+                  class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                  aria-describedby="user_avatar_help"
+                  type="file"
+                  id="images"
+                  name="images"
+                  accept=".jpeg, .jpg, image/jpeg, image/jpg"
+                  multiple
+                />
+
+                <div
+                  class="mt-1 text-sm text-gray-500 dark:text-gray-300"
+                  id="user_avatar_help"
+                >
+                  Select all Possible photos you have of lost person.
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-400 transition duration-300"
+              >
+                Upload
+              </button>
+            </form>
+          </div>
+
+          <!-- Step 2 -->
+
+          <div>
+            <h2 class="text-2xl font-semibold mb-4">
+              Step 2: Post Facial Information
+            </h2>
+            <form
+              enctype="multipart/form-data"
+              action="/post-face"
+              method="post"
+            >
+              <div class="mb-4">
+                <label
+                  for="label"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >Label:</label
+                >
+                <input
+                  type="text"
+                  id="label"
+                  name="label"
+                  required
+                  class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                  placeholder="Lost Person's name"
+                />
+              </div>
+              <div
+                class="mb-2 text-sm text-gray-500 dark:text-gray-300"
+                id="user_avatar_help"
+              >
+                This name will be used to find the Person in our database.
+              </div>
+              <div class="mb-4">
+                <label
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  for="imageUpload"
+                  >Images</label
+                >
+
+                <input
+                  class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                  aria-describedby="lost_person_photos"
+                  type="file"
+                  id="imageUpload"
+                  name="images"
+                  accept=".jpeg, .jpg, image/jpeg, image/jpg"
+                  multiple
+                  required
+                />
+                <div
+                  class="mt-1 text-sm text-gray-500 dark:text-gray-300"
+                  id="user_avatar_help"
+                >
+                  Chose same photos you chose above for Facial Recognition
+                </div>
+              </div>
+              <div
+                class="mt-2 grid grid-cols-3 hover:grid-cols-6"
+                id="imagePreviewContainer"
+              >
+                <!-- Preview images will be shown here -->
+              </div>
+              <button
+                type="submit"
+                class="mt-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-400 transition duration-300"
+              >
+                Upload
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <style>
+      .colored-toast.swal2-icon-success {
+        background-color: #a5dc86 !important;
+      }
+
+      .colored-toast.swal2-icon-error {
+        background-color: #f27474 !important;
+      }
+      .custom-ol {
+        list-style-type: disc; /* Use 'disc', 'lower-roman', 'upper-alpha', etc. */
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      Swal.fire({
+        icon: "info",
+        title: "Instructions for Uploading Photos",
+        html: `
+    <ol class="text-left custom-ol">
+      <li>1. Upload a maximum of 10 photos using the form below.</li>
+      <li>2. Ensure that all input fields are filled out correctly.</li>
+      <li>3. Make sure the uploaded images contain only one person's face and are clear.</li>
+      <li>4. The accepted image formats are strictly limited to JPEG/JPG.</li>
+    </ol>
+  `,
+        confirmButtonText: "Got It",
+        confirmButtonColor: "#3085d6",
+      });
+
+      const imageUpload = document.getElementById("imageUpload");
+      const imagePreviewContainer = document.getElementById(
+        "imagePreviewContainer"
+      );
+
+      imageUpload.addEventListener("change", function () {
+        imagePreviewContainer.innerHTML = "";
+        const files = imageUpload.files;
+        for (const file of files) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const imagePreview = document.createElement("div");
+            imagePreview.classList.add("rounded-lg", "overflow-hidden");
+            imagePreview.style.backgroundImage = `url('${e.target.result}')`;
+            imagePreview.style.backgroundSize = "contain";
+            imagePreview.style.backgroundRepeat = "no-repeat";
+            imagePreview.style.backgroundPosition = "center";
+            imagePreview.style.width = "100%";
+            imagePreview.style.height = "20rem";
+            imagePreviewContainer.appendChild(imagePreview);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    </script>
+
+    <div id="footer-placeholder"></div>
+    <script>
+      const uploadForm = document.getElementById("uploadForm");
+
+      uploadForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const formData = new FormData(uploadForm);
+
+        try {
+          const response = await fetch("/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          const result = await response.json();
+          console.log(result);
+          // Initialize Swal
+          const Toast = Swal.mixin({
+            toast: true,
+            position: "top-right",
+            iconColor: "white",
+            customClass: {
+              popup: "colored-toast",
+            },
+            showConfirmButton: false,
+            timer: 1500,
+            timerProgressBar: true,
+          });
+          await Toast.fire({
+            icon: "success",
+            title: "Step 1 Completed",
+          });
+        } catch (error) {
+          await Toast.fire({
+            icon: "error",
+            title: "Error",
+          });
+        }
+      });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
+    <script src="/assets/Home/js/footer-loader.js"></script>
+    <script src="/assets/Home/js/navbar-loader.js"></script>
+  </body>
+</html>

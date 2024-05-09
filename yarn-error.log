@@ -1,0 +1,60 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Users\pranj\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add @tensorflow/tfjs-node-gpu
+
+PATH: 
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\bin\HostX86\x86;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\VC\VCPackages;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer;C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\bin\Roslyn;C:\Program Files\Microsoft Visual Studio\2022\Community\Team Tools\DiagnosticsHub\Collector;C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\\x86;C:\Program Files (x86)\Windows Kits\10\bin\\x86;C:\Program Files\Microsoft Visual Studio\2022\Community\\MSBuild\Current\Bin\amd64;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\;C:\Python312\Scripts\;C:\Python312\;C:\Python311\Scripts\;C:\Python311\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\msys64\mingw64\bin;C:\ProgramData\chocolatey\bin;C:\Program Files\Git\cmd;C:\Python310;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\MongoDB\Server\7.0\bin;D:\Program Files\mongosh;C:\Program Files\PostgreSQL\15\bin;C:\Program Files\nodejs\;C:\Program Files\Cloudflare\Cloudflare WARP\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Users\pranj\AppData\Local\Microsoft\WindowsApps;C:\Users\pranj\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2021.2.2\bin;C:\Program Files\JetBrains\PyCharm 2021.2.3\bin;C:\Program Files\JetBrains\IntelliJ IDEA 2021.2.3\bin;C:\Users\pranj\AppData\Local\GitHubDesktop\bin;C:\Users\pranj\AppData\Local\Microsoft\WindowsApps;C:\Users\pranj\AppData\Local\JetBrains\Toolbox\scripts;C:\Program Files\MongoDB\Server\6.0\bin\mongod;C:\Program Files\mongosh\bin;C:\Users\pranj\AppData\Local\Programs\oh-my-posh\bin;D:\Program Files\mongosh\;C:\Users\pranj\AppData\Roaming\npm;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\VC\Linux\bin\ConnectionManagerExe;C:\Program Files\Microsoft Visual Studio\2022\Community\VC\vcpkg
+
+Yarn version: 
+  1.22.18
+
+Node version: 
+  20.11.1
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: ENOENT: no such file or directory, lstat 'D:\FSD\LOCO Main\node_modules\@tensorflow\tfjs-node\deps'
+
+npm manifest: 
+  {
+    "name": "lost-and-found-platform",
+    "version": "1.3.0",
+    "description": "This platform allows users to search and register the information for their lost loved ones.",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+      "lost",
+      "and",
+      "found",
+      "machine",
+      "learning"
+    ],
+    "author": "Pranjal Pratap Singh",
+    "license": "MIT",
+    "dependencies": {
+      "@mapbox/node-pre-gyp": "^1.0.11",
+      "@tensorflow/tfjs-node": "^3.1.0",
+      "bcrypt": "^5.1.1",
+      "canvas": "^2.11.2",
+      "express": "^4.18.2",
+      "express-fileupload": "^1.4.0",
+      "express-session": "^1.17.3",
+      "face-api.js": "^0.22.2",
+      "multer": "^1.4.5-lts.1",
+      "nodemon": "^3.1.0",
+      "passport": "^0.6.0",
+      "passport-local": "^1.0.0",
+      "pg": "^8.11.3",
+      "pg-promise": "^11.5.4",
+      "sweetalert2": "^11.7.27"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

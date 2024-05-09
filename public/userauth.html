@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Registration</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .form-container {
+        @keyframes wipe-in-right {
+          from {
+            clip-path: inset(0 100% 0 0);
+          }
+          to {
+            clip-path: inset(0 0 0 0);
+          }
+        }
+
+        [transition-style="in:wipe:right"] {
+          animation: 2.5s cubic-bezier(0.25, 1, 0.3, 1) wipe-in-right both;
+        }
+      }
+      .signup-active .form-container {
+        transform: translateX(-100%);
+      }
+      .login-active .form-container {
+        transform: translateX(0);
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-100">
+    <div id="navbar-placeholder"></div>
+    <div class="bg-gray-100 flex items-center justify-center h-screen">
+      <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
+        <div class="flex justify-between items-center mb-6">
+          <button class="text-blue-500 font-semibold" id="loginButton">
+            Login
+          </button>
+          <button class="text-gray-500 font-semibold" id="signupButton">
+            Signup
+          </button>
+        </div>
+
+        <div class="form-container login-active">
+          <form id="loginForm">
+            <h2 class="text-2xl font-semibold mb-4">Login</h2>
+            <div class="mb-4">
+              <label
+                for="loginemail"
+                class="block text-gray-700 text-sm font-medium mb-2"
+                >Email</label
+              >
+              <input
+                type="email"
+                id="loginemail"
+                name="loginemail"
+                class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-200"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label
+                for="loginpassword"
+                class="block text-gray-700 text-sm font-medium mb-2"
+                >Password</label
+              >
+              <input
+                type="password"
+                id="loginpassword"
+                name="loginpassword"
+                class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-200"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+            >
+              Login
+            </button>
+          </form>
+
+          <!--Sign Up form-->
+
+          <form id="signupForm" class="hidden">
+            <h2 class="text-2xl font-semibold mb-4">Signup</h2>
+            <div class="mb-4">
+              <label
+                for="username"
+                class="block text-gray-700 text-sm font-medium mb-2"
+                >Full Name</label
+              >
+              <input
+                type="text"
+                name="username"
+                id="username"
+                class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-200"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label
+                for="email"
+                class="block text-gray-700 text-sm font-medium mb-2"
+                >Email</label
+              >
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-200"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label
+                for="password"
+                class="block text-gray-700 text-sm font-medium mb-2"
+                >Password</label
+              >
+              <input
+                type="password"
+                name="password"
+                id="password"
+                class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-200"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+            >
+              Signup
+            </button>
+          </form>
+        </div>
+      </div>
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+      <script>
+        const loginFormId = document.getElementById("loginForm");
+        loginFormId.addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          // Create a new FormData object and append the form fields
+          const formData = new FormData();
+          formData.append(
+            "loginemail",
+            document.getElementById("loginemail").value
+          );
+          formData.append(
+            "loginpassword",
+            document.getElementById("loginpassword").value
+          ); // Log the form data values to the console
+          formData.forEach((value, key) => {
+            console.log(key, value);
+          });
+
+          try {
+            const response = await fetch("/login", {
+              method: "POST",
+              body: formData,
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+              // Redirect to a dashboard or home page on successful login
+              window.location.href = "/dashboard";
+            } else {
+              // Display an error message using SweetAlert
+              Swal.fire({
+                icon: "error",
+                title: "Login Failed",
+                text: result.message,
+              });
+            }
+          } catch (error) {
+            console.error(error);
+            Swal.fire({
+              icon: "error",
+              title: "Login Failed",
+              text: "An internal server error occurred.",
+            });
+          }
+        });
+      </script>
+      <script>
+        document
+          .getElementById("signupForm")
+          .addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            // Log the form data values for debugging
+            for (const [key, value] of formData.entries()) {
+              console.log(`${key}: ${value}`);
+            }
+            console.log("Event Target:", event.target);
+            try {
+              console.log("Form Data:", formData); // Log form data for debugging
+              const response = await fetch("/register", {
+                method: "POST",
+                body: formData,
+              });
+
+              const data = await response.json();
+
+              if (data.success) {
+                // Registration was successful, redirect to the home page
+                swal.fire({
+                  icon: "success",
+                  title: "Registration Succesfull",
+                });
+
+                window.location.href = "/";
+              } else {
+                // Registration failed, show error notification
+                swal.fire({
+                  icon: "error",
+                  title: "Registration Error",
+                  text: data.error,
+                });
+              }
+            } catch (error) {
+              console.error("Error:", error.message);
+            }
+          });
+      </script>
+
+      <script>
+        const loginButton = document.getElementById("loginButton");
+        const signupButton = document.getElementById("signupButton");
+        const loginForm = document.getElementById("loginForm");
+        const signupForm = document.getElementById("signupForm");
+        loginButton.addEventListener("click", () => {
+          loginForm.classList.remove("hidden");
+          signupForm.classList.add("hidden");
+          loginButton.classList.add("text-blue-500");
+          signupButton.classList.remove("text-blue-500");
+        });
+
+        signupButton.addEventListener("click", () => {
+          loginForm.classList.add("hidden");
+          signupForm.classList.remove("hidden");
+          signupButton.classList.remove("text-gray-500");
+          signupButton.classList.add("text-blue-500");
+          loginButton.classList.remove("text-blue-500");
+        });
+      </script>
+    </div>
+    <div id="footer-placeholder"></div>
+  </body>
+
+  <script src="/assets/Home/js/footer-loader.js"></script>
+  <script src="/assets/Home/js/navbar-loader.js"></script>
+</html>

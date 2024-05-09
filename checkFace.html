@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Check Face</title>
+    <script src="/dist/face-api.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100">
+    <div id="navbar-placeholder"></div>
+    <div class="min-h-screen flex justify-center items-center">
+      <div class="max-w-md w-full p-6 bg-white shadow-lg rounded-lg">
+        <h1 class="text-2xl font-semibold mb-4">Check Face</h1>
+        <form action="/check-face" method="post" enctype="multipart/form-data">
+          <div class="mb-4">
+            <label for="checkImg" class="block text-gray-700"
+              >Upload Image:</label
+            >
+            <input
+              type="file"
+              id="checkImg"
+              name="checkImg"
+              accept="image/*"
+              required
+              class="w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+            />
+          </div>
+          <div class="text-center">
+            <button
+              type="submit"
+              class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-400 transition duration-300"
+            >
+              Check Face
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="container mx-auto p-6 mt-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-xl font-semibold mb-2">Detected Faces</h2>
+          <canvas id="overlay" class="w-full h-auto"></canvas>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-xl font-semibold mb-2">Results</h2>
+          <div id="result" class="space-y-2"></div>
+        </div>
+      </div>
+    </div>
+    <script src="script.js"></script>
+    <script>
+      document
+        .querySelector("form")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const formData = new FormData(event.target);
+
+          try {
+            console.log("formData:", formData); // Add this log
+            const response = await fetch("/check-face", {
+              method: "POST",
+              body: formData,
+            });
+
+            const data = await response.json();
+            console.log("Response data:", data); // Add this log
+            const canvas = document.getElementById("overlay"); // Get the canvas element
+            console.log("Canvas element:", canvas); // Add this log
+
+            const context = canvas.getContext("2d");
+
+            // Clear the previous drawings
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Load the image
+            const img = new Image();
+            img.src = URL.createObjectURL(formData.get("checkImg"));
+            console.log("Image source:", img.src); // Add this log
+
+            img.onload = () => {
+              console.log("Image loaded"); // Add this log
+              canvas.width = img.width;
+              canvas.height = img.height;
+              context.drawImage(img, 0, 0);
+
+              data.result.forEach((match) => {
+                const label = match._label;
+                const distance = match._distance;
+                const box = match._box;
+
+                // Draw bounding box
+                context.beginPath();
+                context.rect(box._x, box._y, box._width, box._height);
+                context.lineWidth = 2;
+                context.strokeStyle = "red";
+                context.fillStyle = "red";
+                context.stroke();
+                context.fillText(`Label: ${label}`, box._x, box._y - 10);
+
+                const resultItem = document.createElement("p");
+                resultItem.textContent = `Label: ${label}, Distance: ${distance}`;
+                // Append the result to the result div
+                document.getElementById("result").appendChild(resultItem);
+              });
+            };
+          } catch (error) {
+            console.error("Error:", error.message);
+          }
+        });
+    </script>
+  </body>
+</html>

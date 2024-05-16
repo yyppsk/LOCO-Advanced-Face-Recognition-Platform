@@ -1,7 +1,6 @@
 const express = require("express");
 
 const tf = require("@tensorflow/tfjs");
-
 const wasm = require("@tensorflow/tfjs-backend-wasm");
 const faceapi = require("@vladmandic/face-api/dist/face-api.node-wasm.js");
 
@@ -47,7 +46,7 @@ function isAuthenticated(req, res, next) {
 }
 
 // Set the Wasm paths
-wasm.setWasmPaths("");
+wasm.setWasmPaths("node_modules/@tensorflow/tfjs-backend-wasm/dist/");
 
 // Initialize TensorFlow backend
 
@@ -88,6 +87,40 @@ async function createFacesTable() {
 }
 
 createFacesTable();
+
+app.get("/fetchDescriptors", async (req, res) => {
+  try {
+    // Connect to the PostgreSQL database
+    const client = await db.connect();
+
+    // Query to fetch descriptors
+    const query = "SELECT label, descriptions FROM faces";
+
+    // Execute the query
+    const result = await client.query(query);
+
+    // Release the client back to the pool
+    client.release();
+
+    // Process the descriptors to make them more readable
+    const descriptors = result.rows.map((row) => {
+      const label = row.label;
+      const descriptorsArray = row.descriptions.map((descObj) => {
+        const descriptorArray = Object.values(descObj);
+        // Convert to a regular JavaScript array for easier reading
+        return Array.from(descriptorArray);
+      });
+      return { label, descriptors: descriptorsArray };
+    });
+
+    res.json(descriptors);
+  } catch (error) {
+    console.error("Error fetching descriptors:", error.message);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching descriptors" });
+  }
+});
 
 app.get("/upload", isAuthenticated, (req, res) => {
   res.sendFile(__dirname + "/upload.html");

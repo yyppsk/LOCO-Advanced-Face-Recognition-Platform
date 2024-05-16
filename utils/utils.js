@@ -5,17 +5,24 @@ const canvas = require("canvas");
 faceapi.env.monkeyPatch({ Canvas, Image });
 
 async function LoadModels() {
+  const startTime = new Date();
+
   // Load the models
-  // __dirname gives the root directory of the server
+
   await faceapi.nets.faceRecognitionNet.loadFromDisk(__dirname + "/models");
   console.log("Loaded 1");
   await faceapi.nets.faceLandmark68Net.loadFromDisk(__dirname + "/models");
   console.log("Loaded 2");
   await faceapi.nets.ssdMobilenetv1.loadFromDisk(__dirname + "/models");
   console.log("Loaded 3");
+
+  const endTime = new Date();
+  const totalTime = (endTime - startTime) / 1000;
+  console.log(`Models loaded in ${totalTime} seconds`);
 }
 
 LoadModels();
+
 async function getDescriptorsFromDB(imagePath) {
   try {
     const img = await canvas.loadImage(imagePath);
@@ -32,7 +39,6 @@ async function getDescriptorsFromDB(imagePath) {
     const result = await client.query(query);
     client.release();
     const labeledDescriptors = [];
-
     for (const row of result.rows) {
       const descriptors = [];
       // Loop through all descriptors for the label
@@ -50,18 +56,32 @@ async function getDescriptorsFromDB(imagePath) {
         console.error("Descriptor length mismatch:", row.label);
       }
     }
+    const startTime = new Date();
 
-    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 1);
+    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.55);
 
     const detections = await faceapi
       .detectAllFaces(img)
       .withFaceLandmarks()
       .withFaceDescriptors();
+
     const resizedDetections = faceapi.resizeResults(detections, displaySize);
 
-    const results = resizedDetections.map((d) =>
-      faceMatcher.findBestMatch(d.descriptor)
-    );
+    const results = resizedDetections.map((d) => {
+      // Normalize the descriptor
+      const normalizedDescriptor = normalize(d.descriptor);
+      // Perform face matching with the normalized descriptor
+      return faceMatcher.findBestMatch(normalizedDescriptor);
+    });
+
+    function normalize(descriptor) {
+      let sum = 0;
+      for (let i = 0; i < descriptor.length; i++) {
+        sum += descriptor[i] * descriptor[i];
+      }
+      const magnitude = Math.sqrt(sum);
+      return descriptor.map((value) => value / magnitude);
+    }
 
     // Clear the canvas
     ctx.drawImage(img, 0, 0, canvasElement.width, canvasElement.height);
@@ -82,6 +102,9 @@ async function getDescriptorsFromDB(imagePath) {
       };
     });
 
+    const endTime = new Date();
+    const totalTime = (endTime - startTime) / 1000;
+    console.log(`Face Matched in ${totalTime} seconds`);
     return resultsWithBox; // Return results with box information
   } catch (error) {
     console.error(
@@ -92,11 +115,21 @@ async function getDescriptorsFromDB(imagePath) {
   }
 }
 
+function normalize(descriptor) {
+  let sum = 0;
+  for (let i = 0; i < descriptor.length; i++) {
+    sum += descriptor[i] * descriptor[i];
+  }
+  const magnitude = Math.sqrt(sum);
+  return descriptor.map((value) => value / magnitude);
+}
+
 async function uploadLabeledImages(images, label, userId) {
   try {
     const descriptions = [];
     const userIdCurrent = userId;
     // Loop through the images
+    const startTime = new Date();
     for (let i = 0; i < images.length; i++) {
       const img = await canvas.loadImage(images[i]);
       // Read each face and save the face descriptions in the descriptions array
@@ -104,7 +137,8 @@ async function uploadLabeledImages(images, label, userId) {
         .detectSingleFace(img)
         .withFaceLandmarks()
         .withFaceDescriptor();
-      descriptions.push(detections.descriptor);
+      const normalizedDescriptor = normalize(detections.descriptor);
+      descriptions.push(normalizedDescriptor);
     }
 
     // Convert the descriptions array to a JSON string
@@ -144,7 +178,10 @@ async function uploadLabeledImages(images, label, userId) {
     const reportUpdate = await client.query(insertQueryReport, valuesReport);
     client.release();
 
+    const endTime = new Date();
+    const totalTime = (endTime - startTime) / 1000;
     console.log("Inserted face data with ID:", result.rows[0].id);
+    console.log(`Time Taken to Insert Face in ${totalTime} seconds`);
     //console.log("Inserted Person Information:", result2.rows[0].person_id);
     return true;
   } catch (error) {

@@ -185,6 +185,7 @@
                 const label = match._label;
                 const distance = match._distance;
                 const box = match._box;
+                const id = match._id;
 
                 // Draw bounding box
                 context.beginPath();
@@ -199,7 +200,7 @@
                 context.fillText(`Label: ${label}`, box._x, box._y - 10);
 
                 const resultItem = document.createElement("p");
-                resultItem.textContent = `Label: ${label}, Distance: ${distance}`;
+                resultItem.textContent = `Label: ${label}, Distance: ${distance}, ${id}`;
                 // Append the result to the result div
                 document.getElementById("result").appendChild(resultItem);
               });

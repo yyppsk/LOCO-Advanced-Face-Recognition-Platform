@@ -15,8 +15,9 @@ async function LoadModels() {
   console.log("Loaded 2");
   await faceapi.nets.ssdMobilenetv1.loadFromDisk(__dirname + "/models");
   console.log("Loaded 3");
-  await faceapi.nets.ageGenderNet.loadFromDisk(__dirname + "/models");
-  console.log("Loaded 4");
+
+  await faceapi.nets.tinyFaceDetector.loadFromDisk(__dirname + "/models");
+  await faceapi.nets.faceLandmark68TinyNet.loadFromDisk(__dirname + "/models");
   const endTime = new Date();
   const totalTime = (endTime - startTime) / 1000;
   console.log(`Models loaded in ${totalTime} seconds`);
@@ -42,7 +43,7 @@ async function getDescriptorsFromDB(imagePath) {
       const descriptors = [];
       for (const descObj of row.descriptions) {
         const descriptorArray = new Float32Array(Object.values(descObj));
-        descriptors.push(normalize(descriptorArray)); // Normalize descriptors
+        descriptors.push(descriptorArray); // No normalization
       }
 
       labeledDescriptors.push(
@@ -51,7 +52,7 @@ async function getDescriptorsFromDB(imagePath) {
     }
 
     const startTime = new Date();
-    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.5); // Adjust threshold if necessary
+    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.6); // Adjust threshold if necessary
 
     const detections = await faceapi
       .detectAllFaces(img)
@@ -61,31 +62,18 @@ async function getDescriptorsFromDB(imagePath) {
     const resizedDetections = faceapi.resizeResults(detections, displaySize);
 
     const resultsWithBox = resizedDetections.map((detection) => {
-      const normalizedDescriptor = normalize(detection.descriptor);
-      const bestMatch = faceMatcher.findBestMatch(normalizedDescriptor);
+      const bestMatch = faceMatcher.findBestMatch(detection.descriptor); // No normalization
       const box = detection.detection.box;
       const drawBox = new faceapi.draw.DrawBox(box, {
         label: bestMatch.toString(),
       });
       drawBox.draw(canvasElement);
 
-      // Set a minimum distance threshold for known faces
-      const minDistanceThreshold = 0.024; // Adjust as necessary
-      if (bestMatch._distance < minDistanceThreshold) {
-        // If the distance is below the threshold, consider the face as known
-        return {
-          _label: bestMatch._label,
-          _distance: bestMatch._distance,
-          _box: box,
-        };
-      } else {
-        // Otherwise, label the face as "Unknown"
-        return {
-          _label: "Unknown",
-          _distance: bestMatch._distance,
-          _box: box,
-        };
-      }
+      return {
+        _label: bestMatch._label,
+        _distance: bestMatch._distance,
+        _box: box,
+      };
     });
 
     const endTime = new Date();
@@ -101,14 +89,27 @@ async function getDescriptorsFromDB(imagePath) {
   }
 }
 
-function normalize(descriptor) {
-  const sum = descriptor.reduce((acc, val) => acc + val * val, 0);
-  const magnitude = Math.sqrt(sum);
-  return descriptor.map((value) => value / magnitude);
-}
-
-async function uploadLabeledImages(images, label, userId) {
+async function uploadLabeledImages(
+  images,
+  label,
+  userId,
+  gender,
+  city,
+  age,
+  description
+) {
   try {
+    //Tests
+
+    let scoreThreshold = 0.8;
+    inputSize = 512;
+    const Option = new faceapi.SsdMobilenetv1Options({
+      inputSize,
+      scoreThreshold,
+    });
+
+    const useTinyModel = true;
+
     const descriptions = [];
     const userIdCurrent = userId;
     // Loop through the images
@@ -117,11 +118,10 @@ async function uploadLabeledImages(images, label, userId) {
       const img = await canvas.loadImage(images[i]);
       // Read each face and save the face descriptions in the descriptions array
       const detections = await faceapi
-        .detectSingleFace(img)
-        .withFaceLandmarks()
+        .detectSingleFace(img, Option)
+        .withFaceLandmarks(useTinyModel)
         .withFaceDescriptor();
-      const normalizedDescriptor = normalize(detections.descriptor);
-      descriptions.push(normalizedDescriptor);
+      descriptions.push(detections.descriptor);
     }
 
     // Convert the descriptions array to a JSON string
@@ -136,29 +136,41 @@ async function uploadLabeledImages(images, label, userId) {
     // Insert the face data into the PostgreSQL database
 
     const insertQuery = `
-        INSERT INTO faces (label, descriptions, addedbyuserid)
-        VALUES ($1, $2, $3)
-        RETURNING id;
-      `;
+      INSERT INTO faces (label, descriptions, addedbyuserid)
+      VALUES ($1, $2, $3)
+      RETURNING id;
+    `;
 
     const address = `/uploads/${label}/`;
 
     const insertQueryPerson = `
-      INSERT INTO person (name, reported_by, image_path)
-      VALUES ($1, $2, $3)`;
+      INSERT INTO person (name, reported_by, image_path, gender, city, age, description)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `;
 
     const insertQueryReport = `
       INSERT INTO report (user_id)
-      VALUES ($1)`;
+      VALUES ($1)
+    `;
 
     const values = [createFace.label, createFace.descriptions, userIdCurrent];
-    const valuesPerson = [label, userIdCurrent, address];
+    const valuesPerson = [
+      label,
+      userIdCurrent,
+      address,
+      gender,
+      city,
+      age,
+      description,
+    ];
     const valuesReport = [userIdCurrent];
 
     const client = await db.connect();
+    await client.query("BEGIN");
     const result = await client.query(insertQuery, values);
     const personUpdate = await client.query(insertQueryPerson, valuesPerson);
     const reportUpdate = await client.query(insertQueryReport, valuesReport);
+    await client.query("COMMIT");
     client.release();
 
     const endTime = new Date();

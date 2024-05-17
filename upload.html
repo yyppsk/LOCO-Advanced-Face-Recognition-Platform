@@ -16,6 +16,7 @@
 
   <body class="min-h-screen bg-gray-100">
     <div id="navbar-placeholder"></div>
+    <div id="navbar-placeholder"></div>
     <!-- Content wrapper -->
     <div class="grid grid-cols-1 gap-4 p-4 relative">
       <div class="col-span-1">
@@ -47,6 +48,7 @@
                   This name will be used to find the Person in our database.
                 </div>
               </div>
+
               <div class="mb-4">
                 <label
                   class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -106,6 +108,75 @@
                   placeholder="Lost Person's name"
                 />
               </div>
+              <!-- Additional Fields -->
+              <div class="mb-4">
+                <label
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  for="gender"
+                  >Gender</label
+                >
+                <select
+                  id="gender"
+                  name="gender"
+                  class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                  required
+                >
+                  <option value="" disabled selected>Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div class="mb-4">
+                <label
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  for="age"
+                  >Age</label
+                >
+                <input
+                  class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                  type="number"
+                  id="age"
+                  name="age"
+                  placeholder="Age"
+                  min="0"
+                  required
+                />
+              </div>
+
+              <div class="mb-4">
+                <label
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  for="city"
+                  >City</label
+                >
+                <input
+                  class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                  type="text"
+                  id="city"
+                  name="city"
+                  placeholder="City"
+                  required
+                />
+              </div>
+
+              <div class="mb-4">
+                <label
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  for="description"
+                  >Description</label
+                >
+                <textarea
+                  class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                  id="description"
+                  name="description"
+                  rows="4"
+                  placeholder="Description"
+                  required
+                ></textarea>
+              </div>
+              <!-- End of Additional Fields -->
               <div
                 class="mb-2 text-sm text-gray-500 dark:text-gray-300"
                 id="user_avatar_help"
@@ -133,7 +204,7 @@
                   class="mt-1 text-sm text-gray-500 dark:text-gray-300"
                   id="user_avatar_help"
                 >
-                  Chose same photos you chose above for Facial Recognition
+                  Choose the same photos you chose above for Facial Recognition.
                 </div>
               </div>
               <div
@@ -214,6 +285,7 @@
 
       uploadForm.addEventListener("submit", async (event) => {
         event.preventDefault();
+
         const formData = new FormData(uploadForm);
 
         try {
@@ -223,7 +295,7 @@
           });
 
           const result = await response.json();
-          console.log(result);
+
           // Initialize Swal
           const Toast = Swal.mixin({
             toast: true,

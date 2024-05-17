@@ -98,18 +98,31 @@
 
           data.forEach((person) => {
             const card = document.createElement("div");
-            card.className = "bg-white rounded-lg p-4 shadow-lg";
+            card.className = "bg-white rounded-lg p-4 shadow-lg cursor-pointer";
+            card.setAttribute(
+              "onclick",
+              `navigateToProfile('${person.person_id}')`
+            );
             card.innerHTML = `
-            <img src="${person.image_path}${person.name}-1.jpg" alt="${
+              <img src="${person.image_path}${person.name}-1.jpg" alt="${
               person.name
             }'s Image" class="w-full h-auto mt-4">
-            <h3 class="text-xl font-semibold">${person.name}</h3>
-            <p class="text-gray-600">Created on: ${new Date(
-              person.created_at
-            ).toDateString()}</p>
-            <p class="text-gray-600" data-person-id="${
-              person.person_id
-            }">Person ID: ${person.person_id}</p>`;
+              <h3 class="text-xl font-semibold">${person.name}</h3>
+              <p class="text-gray-600">Gender: ${
+                person.gender != null ? person.gender : "Unknown"
+              }</p>
+              <p class="text-gray-600">City: ${
+                person.city != null ? person.city : "Unknown"
+              }</p>
+              <p class="text-gray-600">Age: ${
+                person.age != null ? person.age : "Unknown"
+              }</p>
+              <p class="text-gray-600">Created on: ${new Date(
+                person.created_at
+              ).toDateString()}</p>
+              <p class="text-gray-600" data-person-id="${
+                person.person_id
+              }">Person ID: ${person.person_id}</p>`;
 
             cardsContainer.appendChild(card);
           });
@@ -117,6 +130,13 @@
           console.error(error);
           // Handle errors here
         }
+      }
+
+      // Function to navigate to profile page
+      function navigateToProfile(personId) {
+        // You can implement the navigation logic here
+        // For now, let's log the person ID
+        console.log("Navigating to profile of person with ID:", personId);
       }
 
       // Call the function to fetch and populate data when the page loads

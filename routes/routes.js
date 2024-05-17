@@ -37,7 +37,7 @@ router.get("/dashboardfetch", async (req, res) => {
   try {
     const userId = req.session.user.user_id; // Extract the user_id from the session object
     const query =
-      "SELECT person_id, name, created_at, image_path FROM person where reported_by = $1";
+      "SELECT person_id, name, created_at, image_path, gender,age,city,description FROM person where reported_by = $1";
     const values = [userId];
     const result = await pool.query(query, values);
     if (result.rows.length === 0) {
@@ -82,6 +82,7 @@ router.post("/check-face", upload.single("checkImg"), async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 router.post("/upload", upload.array("images", 10), (req, res) => {
   const { name } = req.body;
   const uploadedImages = req.files; // Array of uploaded files
@@ -111,16 +112,32 @@ router.post("/upload", upload.array("images", 10), (req, res) => {
 
 router.post("/post-face", upload.array("images", 10), async (req, res) => {
   try {
-    const { label } = req.body;
+    const { label, gender, city, age, description } = req.body;
     const files = req.files;
     const userId = req.session.user.user_id; // Extract the user_id from the session object
 
-    if (!label || !files || files.length === 0) {
+    if (
+      !label ||
+      !gender ||
+      !city ||
+      !age ||
+      !description ||
+      !files ||
+      files.length === 0
+    ) {
       return res.status(400).json({ error: "Invalid request data" });
     }
 
     const imagePaths = files.map((file) => file.path);
-    const uploadResult = await uploadLabeledImages(imagePaths, label, userId);
+    const uploadResult = await uploadLabeledImages(
+      imagePaths,
+      label,
+      userId,
+      gender,
+      city,
+      age,
+      description
+    );
 
     if (uploadResult) {
       return res.json({ message: "Face data stored successfully" });

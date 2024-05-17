@@ -15,7 +15,8 @@ async function LoadModels() {
   console.log("Loaded 2");
   await faceapi.nets.ssdMobilenetv1.loadFromDisk(__dirname + "/models");
   console.log("Loaded 3");
-
+  await faceapi.nets.ageGenderNet.loadFromDisk(__dirname + "/models");
+  console.log("Loaded 4");
   const endTime = new Date();
   const totalTime = (endTime - startTime) / 1000;
   console.log(`Models loaded in ${totalTime} seconds`);
@@ -28,37 +29,29 @@ async function getDescriptorsFromDB(imagePath) {
     const img = await canvas.loadImage(imagePath);
     const displaySize = { width: img.width, height: img.height };
     const canvasElement = faceapi.createCanvasFromMedia(img);
-    const ctx = canvasElement.getContext("2d"); // Get canvas context
+    const ctx = canvasElement.getContext("2d");
     faceapi.matchDimensions(canvasElement, displaySize);
 
-    // Get all the face data from the PostgreSQL database
-    const query = `
-        SELECT * FROM faces;
-      `;
+    const query = `SELECT * FROM faces;`;
     const client = await db.connect();
     const result = await client.query(query);
     client.release();
+
     const labeledDescriptors = [];
     for (const row of result.rows) {
       const descriptors = [];
-      // Loop through all descriptors for the label
       for (const descObj of row.descriptions) {
         const descriptorArray = new Float32Array(Object.values(descObj));
-        descriptors.push(descriptorArray);
+        descriptors.push(normalize(descriptorArray)); // Normalize descriptors
       }
 
-      if (descriptors.length > 0) {
-        // Push the labeled descriptors for this label
-        labeledDescriptors.push(
-          new faceapi.LabeledFaceDescriptors(row.label, descriptors)
-        );
-      } else {
-        console.error("Descriptor length mismatch:", row.label);
-      }
+      labeledDescriptors.push(
+        new faceapi.LabeledFaceDescriptors(row.label, descriptors)
+      );
     }
-    const startTime = new Date();
 
-    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.55);
+    const startTime = new Date();
+    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.5); // Adjust threshold if necessary
 
     const detections = await faceapi
       .detectAllFaces(img)
@@ -67,45 +60,38 @@ async function getDescriptorsFromDB(imagePath) {
 
     const resizedDetections = faceapi.resizeResults(detections, displaySize);
 
-    const results = resizedDetections.map((d) => {
-      // Normalize the descriptor
-      const normalizedDescriptor = normalize(d.descriptor);
-      // Perform face matching with the normalized descriptor
-      return faceMatcher.findBestMatch(normalizedDescriptor);
-    });
-
-    function normalize(descriptor) {
-      let sum = 0;
-      for (let i = 0; i < descriptor.length; i++) {
-        sum += descriptor[i] * descriptor[i];
-      }
-      const magnitude = Math.sqrt(sum);
-      return descriptor.map((value) => value / magnitude);
-    }
-
-    // Clear the canvas
-    ctx.drawImage(img, 0, 0, canvasElement.width, canvasElement.height);
-
-    // Draw resized detections and labels
-    const resultsWithBox = resizedDetections.map((detection, i) => {
+    const resultsWithBox = resizedDetections.map((detection) => {
+      const normalizedDescriptor = normalize(detection.descriptor);
+      const bestMatch = faceMatcher.findBestMatch(normalizedDescriptor);
       const box = detection.detection.box;
       const drawBox = new faceapi.draw.DrawBox(box, {
-        label: results[i].toString(),
+        label: bestMatch.toString(),
       });
       drawBox.draw(canvasElement);
 
-      // Include box information in the result
-      return {
-        _label: results[i]._label,
-        _distance: results[i]._distance,
-        _box: box,
-      };
+      // Set a minimum distance threshold for known faces
+      const minDistanceThreshold = 0.024; // Adjust as necessary
+      if (bestMatch._distance < minDistanceThreshold) {
+        // If the distance is below the threshold, consider the face as known
+        return {
+          _label: bestMatch._label,
+          _distance: bestMatch._distance,
+          _box: box,
+        };
+      } else {
+        // Otherwise, label the face as "Unknown"
+        return {
+          _label: "Unknown",
+          _distance: bestMatch._distance,
+          _box: box,
+        };
+      }
     });
 
     const endTime = new Date();
     const totalTime = (endTime - startTime) / 1000;
     console.log(`Face Matched in ${totalTime} seconds`);
-    return resultsWithBox; // Return results with box information
+    return resultsWithBox;
   } catch (error) {
     console.error(
       "Error retrieving face descriptors from the database:",
@@ -116,10 +102,7 @@ async function getDescriptorsFromDB(imagePath) {
 }
 
 function normalize(descriptor) {
-  let sum = 0;
-  for (let i = 0; i < descriptor.length; i++) {
-    sum += descriptor[i] * descriptor[i];
-  }
+  const sum = descriptor.reduce((acc, val) => acc + val * val, 0);
   const magnitude = Math.sqrt(sum);
   return descriptor.map((value) => value / magnitude);
 }

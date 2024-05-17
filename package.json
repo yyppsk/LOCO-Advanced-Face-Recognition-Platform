@@ -34,6 +34,7 @@
     "pg-promise": "^11.5.4",
     "safer-buffer": "^2.1.2",
     "seedrandom": "^3.0.5",
+    "sharp": "^0.33.4",
     "signal-exit": "^4.1.0",
     "sweetalert2": "^11.7.27"
   }

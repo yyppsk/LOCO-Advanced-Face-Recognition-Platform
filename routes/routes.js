@@ -5,6 +5,8 @@ const router = express.Router();
 const pool = require("../db/db");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
+const sharp = require("sharp");
+
 const { getDescriptorsFromDB, uploadLabeledImages } = require("../utils/utils");
 
 /////////////////////////GET ROUTES////////////////////////
@@ -61,16 +63,25 @@ router.post("/check-face", upload.single("checkImg"), async (req, res) => {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    const imagePath = uploadedFile.path;
+    let imagePath = uploadedFile.path;
     console.log(imagePath);
+
+    // Ensure the image has an extension
+    if (path.extname(imagePath) === "") {
+      fs.renameSync(imagePath, imagePath + ".jpg");
+      imagePath = imagePath + ".jpg";
+    }
+
     const result = await getDescriptorsFromDB(imagePath);
     res.json({ result });
+
+    // Delete the image after processing
+    fs.unlinkSync(imagePath);
   } catch (error) {
     console.error("Error checking face:", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
 router.post("/upload", upload.array("images", 10), (req, res) => {
   const { name } = req.body;
   const uploadedImages = req.files; // Array of uploaded files

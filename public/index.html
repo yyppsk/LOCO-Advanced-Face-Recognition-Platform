@@ -27,31 +27,77 @@
       </script>
       <!--End of Tawk.to Script-->
     </div>
+
+    <style>
+      @keyframes fade-in-out {
+        0%,
+        100% {
+          opacity: 0;
+        }
+        33.33%,
+        66.66% {
+          opacity: 1;
+        }
+      }
+
+      .banner-images img:nth-child(2) {
+        animation: fade-in-out 9s infinite;
+      }
+
+      .banner-images img:nth-child(3) {
+        animation: fade-in-out 9s infinite 3s;
+      }
+
+      .banner-images img:nth-child(4) {
+        animation: fade-in-out 9s infinite 6s;
+      }
+    </style>
+
     <!-- Hero section -->
     <section
-      class="bg-gradient-to-b from-gray-800 to-black text-white h-screen"
+      class="relative bg-gradient-to-b from-gray-800 to-black text-white h-screen overflow-hidden"
     >
-      <div class="container mx-auto px-6 py-24">
-        <div class="grid grid-cols-2 gap-12">
+      <div class="absolute inset-0 banner-images bg-black opacity-40">
+        <img
+          src="Banner1.png"
+          alt="Face Recognition Illustration 1"
+          class="absolute inset-0 w-full h-full object-cover opacity-0 fade-in-out"
+        />
+        <img
+          src="Banner2.png"
+          alt="Face Recognition Illustration 2"
+          class="absolute inset-0 w-full h-full object-cover opacity-0 fade-in-out"
+        />
+        <img
+          src="Banner3.png"
+          alt="Face Recognition Illustration 3"
+          class="absolute inset-0 w-full h-full object-cover opacity-0 fade-in-out"
+        />
+      </div>
+      <div
+        class="relative container mx-auto px-6 py-24 h-full flex items-center"
+      >
+        <div class="grid grid-cols-2 gap-12 w-full">
           <div class="col-span-1">
             <h1 class="text-5xl font-extrabold mb-6">
-              Empower Your Security with Face Recognition
+              LOCO : Lost Connections
             </h1>
             <p class="text-xl mb-8">
               Discover the future of advanced security solutions with our
               cutting-edge face recognition technology.
             </p>
             <a
-              href="#"
+              href="/login"
               class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full font-semibold transition duration-300 ease-in-out inline-block"
-              >Get Started</a
             >
+              Get Started
+            </a>
           </div>
-          <div class="col-span-1 flex items-center justify-center">
+          <div class="col-span-1 flex items-center justify-center relative">
             <img
               src="./assets/Home/hero-image-trans.png"
               alt="Face Recognition Illustration"
-              class="w-full max-w-lg"
+              class="w-full max-w-lg relative z-10"
             />
           </div>
         </div>
@@ -71,98 +117,7 @@
             Our face recognition technology is fast, accurate, and secure.
           </p>
         </div>
-        <div class="mt-12">
-          <form
-            action="#"
-            method="POST"
-            class="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8"
-          >
-            <div>
-              <label
-                for="first_name"
-                class="block text-sm font-medium text-gray-700"
-                >First name</label
-              >
-              <div class="mt-1">
-                <input
-                  type="text"
-                  name="first_name"
-                  id="first_name"
-                  autocomplete="given-name"
-                  class="py-3 px-4 block w-full shadow-sm focus:ring-green-500 focus:border-green-500 border-gray-300 rounded-md"
-                />
-              </div>
-            </div>
-            <div>
-              <label
-                for="last_name"
-                class="block text-sm font-medium text-gray-700"
-                >Last name</label
-              >
-              <div class="mt-1">
-                <input
-                  type="text"
-                  name="last_name"
-                  id="last_name"
-                  autocomplete="family-name"
-                  class="py-3 px-4 block w-full shadow-sm focus:ring-green-500 focus:border-green-500 border-gray-300 rounded-md"
-                />
-              </div>
-            </div>
-            <div class="sm:col-span-2">
-              <label for="email" class="block text-sm font-medium text-gray-700"
-                >Email</label
-              >
-              <div class="mt-1">
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  autocomplete="email"
-                  class="py-3 px-4 block w-full shadow-sm focus:ring-green-500 focus:border-green-500 border-gray-300 rounded-md"
-                />
-              </div>
-            </div>
-            <div class="sm:col-span-2">
-              <label for="phone" class="block text-sm font-medium text-gray-700"
-                >Phone</label
-              >
-              <div class="mt-1 relative rounded-md shadow-sm">
-                <input
-                  type="text"
-                  name="phone"
-                  id="phone"
-                  autocomplete="tel"
-                  class="py-3 px-4 block w-full focus:ring-green-500 focus:border-green-500 border-gray-300 rounded-md"
-                  placeholder="+1 (555) 987-6543"
-                />
-              </div>
-            </div>
-            <div class="sm:col-span-2">
-              <label
-                for="message"
-                class="block text-sm font-medium text-gray-700"
-                >Message</label
-              >
-              <div class="mt-1">
-                <textarea
-                  id="message"
-                  name="message"
-                  rows="4"
-                  class="shadow-sm focus:ring-green-500 focus:border-green-500 mt-1 block w-full sm:text-sm border-gray-300 rounded-md"
-                ></textarea>
-              </div>
-            </div>
-            <div class="sm:col-span-2">
-              <button
-                type="submit"
-                class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-              >
-                Submit
-              </button>
-            </div>
-          </form>
-        </div>
+        <div class="mt-12"></div>
       </div>
     </div>
     <!-- Testimonial section -->

@@ -5,52 +5,147 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Check Face</title>
     <script src="/dist/face-api.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com" rel="stylesheet"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <style>
+      /* Additional custom styling can go here */
+      .form-container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+      }
+      .form-label {
+        font-weight: bold;
+        color: #333;
+      }
+      .form-input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .form-button {
+        background-color: #0074d9;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      .form-button:hover {
+        background-color: #0056b3;
+      }
+    </style>
   </head>
+  <div id="navbar-placeholder"></div>
   <body class="bg-gray-100">
-    <div id="navbar-placeholder"></div>
-    <div class="min-h-screen flex justify-center items-center">
-      <div class="max-w-md w-full p-6 bg-white shadow-lg rounded-lg">
-        <h1 class="text-2xl font-semibold mb-4">Check Face</h1>
+    <div class="flex">
+      <!-- Left Section: Upload Option -->
+      <!-- Left Section: Upload Option -->
+      <div class="form-container">
+        <h1 class="text-2xl font-semibold mb-4 text-center">Check Face</h1>
         <form action="/check-face" method="post" enctype="multipart/form-data">
           <div class="mb-4">
-            <label for="checkImg" class="block text-gray-700"
-              >Upload Image:</label
-            >
+            <label for="checkImg" class="form-label">
+              <i class="fas fa-upload"></i> Upload Image:
+            </label>
             <input
               type="file"
               id="checkImg"
               name="checkImg"
               accept="image/*"
               required
-              class="w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+              class="form-input border rounded-lg p-2 w-full"
             />
           </div>
-          <div class="text-center">
+          <!-- Image preview will be displayed here -->
+          <div class="mt-4 flex justify-center">
+            <img
+              src="https://via.placeholder.com/150"
+              alt="Uploaded Image"
+              id="imagePreview"
+              class="max-w-full max-h-52"
+            />
+          </div>
+          <div class="text-center mt-4">
             <button
               type="submit"
-              class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-400 transition duration-300"
+              class="form-button bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400 transition duration-300"
             >
-              Check Face
+              <i class="fas fa-search"></i> Check Face
             </button>
           </div>
         </form>
       </div>
-    </div>
 
-    <div class="container mx-auto p-6 mt-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <script>
+        const fileInput = document.getElementById("checkImg");
+        const imagePreview = document.getElementById("imagePreview");
+
+        fileInput.addEventListener("change", (event) => {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const imageUrl = e.target.result;
+              imagePreview.src = imageUrl;
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      </script>
+
+      <!-- Right Section: Results Display -->
+      <div class="w-full h-full bg-gray-200 p-6 overflow-auto">
         <div class="bg-white p-6 rounded-lg shadow-md">
-          <h2 class="text-xl font-semibold mb-2">Detected Faces</h2>
-          <canvas id="overlay" class="w-full h-auto"></canvas>
+          <h2 class="text-xl font-semibold mb-4 text-center">Detected Faces</h2>
+          <div class="flex justify-center">
+            <canvas id="overlay" class="w-1/4 h-1/4"></canvas>
+          </div>
         </div>
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h2 class="text-xl font-semibold mb-2">Results</h2>
-          <div id="result" class="space-y-2"></div>
+        <div class="bg-white p-6 rounded-lg shadow-md mt-4">
+          <h2 class="text-xl font-semibold mb-4 text-center">Results</h2>
+          <div
+            id="result-container"
+            style="height: 200px; overflow-y: auto; background-color: #f9f9f9"
+          >
+            <div id="result" class="space-y-2 text-center">
+              <!-- Your result items go here -->
+              <!-- For each new row, add a <p> element with the appropriate content -->
+              <!-- Example: -->
+              <!-- <p>Label: Item 1, Distance: 0.5</p> -->
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    <script src="script.js"></script>
+    <style>
+      #result-container {
+        height: 200px;
+        overflow-y: auto;
+        background-color: #f9f9f9;
+      }
+
+      #result p {
+        padding: 10px;
+        margin: 0;
+        transition: background-color 0.3s ease; /* Add hover animation */
+      }
+
+      #result p:hover {
+        background-color: #a8ddff; /* Change background color on hover */
+        cursor: pointer;
+      }
+    </style>
+
     <script>
       document
         .querySelector("form")
@@ -78,10 +173,10 @@
             // Load the image
             const img = new Image();
             img.src = URL.createObjectURL(formData.get("checkImg"));
-            console.log("Image source:", img.src); // Add this log
+            console.log("Image source:", img.src);
 
             img.onload = () => {
-              console.log("Image loaded"); // Add this log
+              console.log("Image loaded");
               canvas.width = img.width;
               canvas.height = img.height;
               context.drawImage(img, 0, 0);
@@ -94,10 +189,13 @@
                 // Draw bounding box
                 context.beginPath();
                 context.rect(box._x, box._y, box._width, box._height);
-                context.lineWidth = 2;
+                context.lineWidth = 4;
                 context.strokeStyle = "red";
                 context.fillStyle = "red";
                 context.stroke();
+
+                // Set the font size for the label
+                context.font = "20px Arial"; // Increase the pixel size as needed
                 context.fillText(`Label: ${label}`, box._x, box._y - 10);
 
                 const resultItem = document.createElement("p");
@@ -111,5 +209,6 @@
           }
         });
     </script>
+    <script src="/assets/Home/js/navbar-loader.js"></script>
   </body>
 </html>

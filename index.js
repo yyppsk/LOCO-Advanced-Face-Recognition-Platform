@@ -32,8 +32,6 @@ app.use(
   })
 );
 
-app.set("view engine", "ejs");
-
 function isAuthenticated(req, res, next) {
   // Check if the user is authenticated based on the session data
   if (req.session.user) {
@@ -56,8 +54,6 @@ async function initialize() {
 }
 
 initialize();
-
-// app.use(fileUpload({ useTempFiles: true }));
 
 app.use(express.json()); // For parsing application/json
 app.use(

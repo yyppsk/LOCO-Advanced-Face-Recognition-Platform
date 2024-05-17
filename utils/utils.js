@@ -33,12 +33,14 @@ async function getDescriptorsFromDB(imagePath) {
     const ctx = canvasElement.getContext("2d");
     faceapi.matchDimensions(canvasElement, displaySize);
 
-    const query = `SELECT * FROM faces;`;
+    const query = `SELECT id, label, descriptions FROM faces;`;
     const client = await db.connect();
     const result = await client.query(query);
     client.release();
 
     const labeledDescriptors = [];
+    const idMap = {};
+
     for (const row of result.rows) {
       const descriptors = [];
       for (const descObj of row.descriptions) {
@@ -49,37 +51,42 @@ async function getDescriptorsFromDB(imagePath) {
       labeledDescriptors.push(
         new faceapi.LabeledFaceDescriptors(row.label, descriptors)
       );
+      idMap[row.label] = row.id; // Map label to id
     }
 
     const startTime = new Date();
     const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.6); // Adjust threshold if necessary
 
-    const detections = await faceapi
-      .detectAllFaces(img)
+    const detection = await faceapi
+      .detectSingleFace(img)
       .withFaceLandmarks()
-      .withFaceDescriptors();
+      .withFaceDescriptor();
 
-    const resizedDetections = faceapi.resizeResults(detections, displaySize);
+    if (detection) {
+      const resizedDetection = faceapi.resizeResults(detection, displaySize);
 
-    const resultsWithBox = resizedDetections.map((detection) => {
-      const bestMatch = faceMatcher.findBestMatch(detection.descriptor); // No normalization
-      const box = detection.detection.box;
+      const bestMatch = faceMatcher.findBestMatch(resizedDetection.descriptor); // No normalization
+      const box = resizedDetection.detection.box;
       const drawBox = new faceapi.draw.DrawBox(box, {
         label: bestMatch.toString(),
       });
       drawBox.draw(canvasElement);
 
-      return {
+      const resultWithBox = {
+        _id: idMap[bestMatch._label], // Get the id using the label
         _label: bestMatch._label,
         _distance: bestMatch._distance,
         _box: box,
       };
-    });
 
-    const endTime = new Date();
-    const totalTime = (endTime - startTime) / 1000;
-    console.log(`Face Matched in ${totalTime} seconds`);
-    return resultsWithBox;
+      const endTime = new Date();
+      const totalTime = (endTime - startTime) / 1000;
+      console.log(`Face Matched in ${totalTime} seconds`);
+      return [resultWithBox];
+    } else {
+      console.log("No face detected.");
+      return [];
+    }
   } catch (error) {
     console.error(
       "Error retrieving face descriptors from the database:",

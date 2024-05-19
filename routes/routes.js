@@ -55,6 +55,25 @@ router.get("/fetchUserInfobyid/:id", async (req, res) => {
   }
 });
 
+// FETCH MISSING PEOPLE
+router.get("/fetchAllMissing/", async (req, res) => {
+  try {
+    const client = await pool.connect();
+    const queryText = `SELECT * FROM person`;
+    const result = await client.query(queryText);
+    client.release();
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: "No missing persons found" });
+    } else {
+      res.status(200).json(result.rows);
+    }
+  } catch (error) {
+    console.error("Error fetching user information:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 //FETCH AGENCY
 
 router.get("/fetchReportedBy/:id", async (req, res) => {
@@ -63,7 +82,7 @@ router.get("/fetchReportedBy/:id", async (req, res) => {
   try {
     const client = await pool.connect();
     const queryText = `
-      SELECT username, email
+      SELECT username, email, mobile
       FROM appuser
       WHERE user_id = $1;
     `;

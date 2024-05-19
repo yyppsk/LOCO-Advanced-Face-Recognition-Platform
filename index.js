@@ -130,6 +130,10 @@ app.get("/start", (req, res) => {
   res.sendFile(__dirname + "/start.html");
 });
 
+app.get("/displayrecords", (req, res) => {
+  res.sendFile(__dirname + "/public/displayrecords.html");
+});
+
 app.get("/userauth", (req, res) => {
   res.sendFile(__dirname + "/public/userauth.html");
 });

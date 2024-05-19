@@ -100,6 +100,71 @@ router.get("/fetchReportedBy/:id", async (req, res) => {
   }
 });
 
+//MODIFY ENTRY
+router.put("/persons/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+  const { name, gender, age, city, description } = req.body;
+
+  try {
+    // Update the person's data in the database
+    const updatedPerson = await pool.query(
+      "UPDATE person SET name = $1, gender = $2, age = $3, city = $4, description = $5 WHERE person_id = $6 RETURNING *",
+      [name, gender, age, city, description, id]
+    );
+
+    // Check if the person with the specified ID exists
+    if (updatedPerson.rowCount === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Person not found" });
+    }
+
+    res.json({
+      success: true,
+      message: "Record updated successfully",
+      updatedPerson: updatedPerson.rows[0],
+    });
+  } catch (error) {
+    console.error("Error updating person:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while updating the record",
+    });
+  }
+});
+
+//DELETE ENTRY
+router.delete("/persons/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+
+  try {
+    // Delete the person with the specified ID from the database
+    const deletedPerson = await pool.query(
+      "DELETE FROM person WHERE person_id = $1 RETURNING *",
+      [id]
+    );
+
+    // Check if the person with the specified ID exists
+    if (deletedPerson.rowCount === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Person not found" });
+    }
+
+    res.json({
+      success: true,
+      message: "Record deleted successfully",
+      deletedPerson: deletedPerson.rows[0],
+    });
+  } catch (error) {
+    console.error("Error deleting person:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while deleting the record",
+    });
+  }
+});
+
 //Dashboard Route
 
 router.get("/dashboardfetch", async (req, res) => {

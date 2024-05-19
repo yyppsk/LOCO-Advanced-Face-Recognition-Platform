@@ -67,7 +67,7 @@
           data.forEach((person) => {
             const div = document.createElement("div");
             const img = document.createElement("img");
-            img.className = "h-72 w-96 rounded-lg mb-2 object-cover";
+            img.className = "h-72 rounded-lg mb-2 object-none object-bottom";
 
             img.alt = person.name;
             img.src = `${person.image_path}/${person.name}-1.jpg`;
@@ -118,6 +118,7 @@
                     reportedbyEle.textContent = reportingAgencyInfo.username;
                     Swal.fire({
                       title: "Reporting Agency Information",
+                      icon: "success",
                       html: `
                         <p>Username: ${reportingAgencyInfo.username}</p>
                         <p>Email: ${reportingAgencyInfo.email}</p>

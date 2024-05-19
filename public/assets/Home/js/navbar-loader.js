@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       loginbtn.classList.toggle("hidden");
       signupbtn.classList.toggle("hidden");
       // Set the innerHTML of the span elements with the user data
-      usernameElement.innerHTML = `Hola ${user.username}`;
+      usernameElement.innerHTML = `Hey ${user.username}`;
       emailElement.innerHTML = user.email;
     } else {
       // Handle the case when no user data is returned

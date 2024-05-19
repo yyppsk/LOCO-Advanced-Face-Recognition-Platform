@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const response = await fetch("/fetchuserinfo");
     const data = await response.json();
-    console.log("hola");
+
     if (data.length > 0) {
       const user = data[0];
       const name = user.username.split(" ");

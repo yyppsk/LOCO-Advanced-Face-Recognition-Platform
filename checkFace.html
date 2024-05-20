@@ -227,25 +227,27 @@
 
                       // Create button HTML using Tailwind CSS classes
                       const buttonHTML = `
-    <button id="contactAgencyButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2">
-      Contact Reporting Agency
-    </button>
-  `;
+                      <button id="contactAgencyButton-${id}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2">
+                        Contact Reporting Agency
+                      </button>
+                    `;
 
                       // Set innerHTML of resultItem to include cityLink and buttonHTML
                       resultItem.innerHTML = `
-    ID: ${data.person_id} - Name: ${data.name}<br>
-    Gender: ${data.gender}<br>
-    Age: ${data.age}<br>
-    Address: ${cityLink}<br>
-    Reported by: ${data.reported_by}<br>
-    Created at: ${new Date(data.created_at).toLocaleString()}<br>
-    ${buttonHTML}
-  `;
+                      ID: ${data.person_id} - Name: ${data.name}<br>
+                      Gender: ${data.gender}<br>
+                      Age: ${data.age}<br>
+                      Address: ${cityLink}<br>
+                      Reported by: ${data.reported_by}<br>
+                      Created at: ${new Date(
+                        data.created_at
+                      ).toLocaleString()}<br>
+                      ${buttonHTML}
+                    `;
 
                       // Handle click event on the Contact Agency button
                       document
-                        .getElementById("contactAgencyButton")
+                        .getElementById(`contactAgencyButton-${id}`)
                         .addEventListener("click", () => {
                           // Trigger fetch request to fetch information about the reported agency
                           fetch(`/fetchReportedBy/${data.reported_by}`)
@@ -260,10 +262,10 @@
                               Swal.fire({
                                 title: "Reporting Agency Information",
                                 html: `
-            <p>Username: ${reportingAgencyInfo.username}</p>
-            <p>Email: ${reportingAgencyInfo.email}</p>
-            <p>Phone Number: ${reportingAgencyInfo.mobile}</p>
-          `,
+                                <p>Username: ${reportingAgencyInfo.username}</p>
+                                <p>Email: ${reportingAgencyInfo.email}</p>
+                                <p>Phone Number: ${reportingAgencyInfo.mobile}</p>
+                              `,
                               });
                             })
                             .catch((error) => {

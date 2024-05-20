@@ -8,7 +8,6 @@ const multer = require("multer");
 const path = require("path");
 const app = express();
 const port = 3000;
-// const bodyParser = require("body-parser");
 
 const { Canvas, Image } = require("canvas");
 const session = require("express-session");
@@ -17,36 +16,29 @@ const { default: Swal } = require("sweetalert2");
 
 const db = require("./db/db");
 
-const routes = require("./routes/routes"); // Import the routes module
+const routes = require("./routes/routes");
 
-// const fileUpload = require("express-fileupload");
 faceapi.env.monkeyPatch({ Canvas, Image });
-// app.use(bodyParser.text({ type: "/" }));
+
 app.use(express.static("public"));
+
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(
   session({
-    secret: "123456", // Change this to a secure secret
+    secret: "123456",
     resave: false,
     saveUninitialized: false,
   })
 );
 
 function isAuthenticated(req, res, next) {
-  // Check if the user is authenticated based on the session data
   if (req.session.user) {
-    // User is authenticated; you can proceed to the next middleware or route handler
     return next();
   }
-
-  // User is not authenticated; you can handle this as needed (e.g., redirect to login page)
   res.redirect("/login");
 }
 
-// Set the Wasm paths
 wasm.setWasmPaths("node_modules/@tensorflow/tfjs-backend-wasm/dist/");
-
-// Initialize TensorFlow backend
 
 async function initialize() {
   await tf.setBackend("wasm");
@@ -55,14 +47,13 @@ async function initialize() {
 
 initialize();
 
-app.use(express.json()); // For parsing application/json
+app.use(express.json());
 app.use(
   express.urlencoded({
     extended: true,
   })
-); // For parsing application/x-www-form-urlencoded
+);
 
-// Create a faces table
 async function createFacesTable() {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS faces (
@@ -83,40 +74,6 @@ async function createFacesTable() {
 }
 
 createFacesTable();
-
-app.get("/fetchDescriptors", async (req, res) => {
-  try {
-    // Connect to the PostgreSQL database
-    const client = await db.connect();
-
-    // Query to fetch descriptors
-    const query = "SELECT label, descriptions FROM faces";
-
-    // Execute the query
-    const result = await client.query(query);
-
-    // Release the client back to the pool
-    client.release();
-
-    // Process the descriptors to make them more readable
-    const descriptors = result.rows.map((row) => {
-      const label = row.label;
-      const descriptorsArray = row.descriptions.map((descObj) => {
-        const descriptorArray = Object.values(descObj);
-        // Convert to a regular JavaScript array for easier reading
-        return Array.from(descriptorArray);
-      });
-      return { label, descriptors: descriptorsArray };
-    });
-
-    res.json(descriptors);
-  } catch (error) {
-    console.error("Error fetching descriptors:", error.message);
-    res
-      .status(500)
-      .json({ error: "An error occurred while fetching descriptors" });
-  }
-});
 
 app.get("/upload", isAuthenticated, (req, res) => {
   res.sendFile(__dirname + "/upload.html");
@@ -162,10 +119,6 @@ app.get("/api/isAuthenticated", (req, res) => {
 });
 
 const upload = multer({ dest: "uploads/" });
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
 
 // User registration endpoint
 
@@ -246,23 +199,9 @@ app.post("/login", upload.none(), async (req, res) => {
   }
 });
 
-///////////////////////////////////login-end//////////////////////////////////////
-
-/////////////////////////////////Fetch User Info////////////////////////////////
-
 // Use the route defined in routes.js
 app.use("/", routes);
 
-// Define a random test route
-app.get("/test-user-id", (req, res) => {
-  // Extract the user_id from the session object
-  const userId = req.session.user.user_id;
-
-  // Check if the user is logged in (assuming user_id is a required session property)
-  if (!userId) {
-    return res.status(401).send("User not logged in");
-  }
-
-  // Display the user ID
-  res.send(`Logged-in User ID: ${userId}`);
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });

@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Missing Persons</title>
-
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css"
       rel="stylesheet"
@@ -12,8 +11,8 @@
   </head>
   <body>
     <div id="navbar-placeholder"></div>
-    <div class="px-8">
-      <div class="flex items-center justify-center py-4 md:py-8 flex-wrap">
+    <div class="px-8 pb-4">
+      <div class="flex items-center justify-center py-4 md:py-4 flex-wrap">
         <button
           type="button"
           class="sort-button text-blue-700 hover:text-white border border-blue-600 bg-white hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-full text-base font-medium px-5 py-2.5 text-center me-3 mb-3 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-500 dark:bg-gray-900 dark:focus:ring-blue-800"
@@ -44,112 +43,34 @@
         </button>
       </div>
 
+      <!-- Search input and button -->
+      <div class="flex justify-center pb-8">
+        <input
+          id="search-input"
+          type="text"
+          placeholder="Search by name"
+          class="px-4 mr-8 py-2 borde w-96 w-min"
+          style="border-radius: 1.2rem"
+        />
+        <button
+          id="search-button"
+          style="border-radius: 0.2rem"
+          class="px-4 py-2 bg-blue-500 text-white"
+        >
+          Search
+        </button>
+      </div>
+
       <div
         id="gallery"
         class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2"
       >
         <!-- The data from the API will be inserted here -->
       </div>
+      <div id="footer-placeholder"></div>
 
-      <script>
-        let data = [];
-        fetch("/fetchAllMissing/")
-          .then((response) => response.json())
-          .then((fetchedData) => {
-            data = fetchedData;
-            displayData(data);
-          })
-          .catch((error) => console.error("Error:", error));
-
-        function displayData(data) {
-          const gallery = document.querySelector("#gallery");
-          gallery.innerHTML = "";
-          data.forEach((person) => {
-            const div = document.createElement("div");
-            const img = document.createElement("img");
-            img.className = "h-72 rounded-lg mb-2 object-none object-bottom";
-
-            img.alt = person.name;
-            img.src = `${person.image_path}/${person.name}-1.jpg`;
-
-            const dateObj = new Date(person.created_at);
-
-            const options = {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            };
-
-            const readableDate = dateObj.toLocaleDateString("en-US", options);
-            // Create button HTML using Tailwind CSS classes
-            const buttonHTML = `
-                    <button id="contactAgencyButton-${person.person_id}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2">
-                    Contact Reporting Agency
-                    </button>
-                `;
-
-            div.appendChild(img);
-            div.innerHTML += `
-                        <h2>${person.name}</h2>
-                        <p>${person.description}</p>
-                        <p>Reported by: <span id="${person.reported_by}-${person.person_id}">Click Button to Reveal</span></p>
-                        <p class="text-pretty">City: ${person.city}</p>
-                        <p>Gender: ${person.gender}</p>
-                        <p>Reported at: ${readableDate}</p>
-                        <br>
-                        ${buttonHTML}
-                    `;
-            gallery.appendChild(div);
-            document
-              .getElementById(`contactAgencyButton-${person.person_id}`)
-              .addEventListener("click", () => {
-                // Trigger fetch request to fetch information about the reported agency
-                fetch(`/fetchReportedBy/${person.reported_by}`)
-                  .then((response) => {
-                    if (!response.ok) {
-                      throw new Error("Network response was not ok");
-                    }
-                    return response.json();
-                  })
-                  .then((reportingAgencyInfo) => {
-                    const reportedbyEle = document.getElementById(
-                      `${person.reported_by}-${person.person_id}`
-                    );
-                    reportedbyEle.textContent = reportingAgencyInfo.username;
-                    Swal.fire({
-                      title: "Reporting Agency Information",
-                      icon: "success",
-                      html: `
-                        <p>Username: ${reportingAgencyInfo.username}</p>
-                        <p>Email: ${reportingAgencyInfo.email}</p>
-                        <p>Phone Number: ${reportingAgencyInfo.mobile}</p>
-                    `,
-                    });
-                  })
-                  .catch((error) => {
-                    console.error(
-                      "Error fetching reporting agency information:",
-                      error
-                    );
-                    // Display error message in SweetAlert modal
-                    Swal.fire({
-                      icon: "error",
-                      title: "Oops...",
-                      text: "Failed to fetch reporting agency information!",
-                    });
-                  });
-              });
-          });
-        }
-
-        document.querySelectorAll(".sort-button").forEach((button) => {
-          button.addEventListener("click", () => {
-            const sortKey = button.dataset.sort;
-            data.sort((a, b) => a[sortKey].localeCompare(b[sortKey]));
-            displayData(data);
-          });
-        });
-      </script>
+      <script src="/assets/Home/js/footer-loader.js"></script>
+      <script src="./assets/logic/displayrecords.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
       <script src="/assets/Home/js/navbar-loader.js"></script>

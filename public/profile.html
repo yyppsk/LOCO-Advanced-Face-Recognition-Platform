@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profile</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+      integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <div id="navbar-placeholder"></div>
+  <body class="bg-gray-100">
+    <!-- Profile Container -->
+    <div class="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
+      <!-- Profile Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center space-x-4">
+          <img
+            class="w-16 h-16 rounded-full"
+            src="./assets/imgs/defualtPic.png"
+            alt="Profile Picture"
+          />
+          <div>
+            <h1 class="text-xl font-bold text-gray-900" id="user">John Doe</h1>
+            <p class="text-gray-600" id="user-email">john.doe@example.com</p>
+            <p class="text-gray-600" id="mobile">+1 (123) 456-7890</p>
+          </div>
+        </div>
+        <!-- Edit Profile Button -->
+        <button
+          id="edit-profile-button"
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        >
+          Edit Profile
+        </button>
+      </div>
+
+      <!-- Profile Details -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900 mb-2">
+            Personal Information
+          </h2>
+          <p class="text-gray-700">
+            <strong>Username:</strong>
+            <span id="username-detail">john_doe</span>
+          </p>
+          <p class="text-gray-700">
+            <strong>Email:</strong>
+            <span id="email-detail">john.doe@example.com</span>
+          </p>
+          <p class="text-gray-700">
+            <strong>Phone:</strong>
+            <span id="mobile-detail">+1 (123) 456-7890</span>
+          </p>
+          <p class="text-gray-700"><strong>Password:</strong> ********</p>
+        </div>
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900 mb-2">
+            Account Information
+          </h2>
+          <p class="text-gray-700">
+            <strong>Account Created:</strong>
+            <span id="created-at">January 1, 2020</span>
+          </p>
+          <p class="text-gray-700">
+            <strong>Verified:</strong> <span id="is-verified">Yes</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div
+      id="editProfileModal"
+      tabindex="-1"
+      class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full justify-center items-center"
+    >
+      <div class="relative p-4 w-full max-w-md h-full md:h-auto">
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+          <div
+            class="flex justify-between items-center p-5 rounded-t border-b dark:border-gray-600"
+          >
+            <h3 class="text-xl font-medium text-gray-900 dark:text-white">
+              Edit Profile
+            </h3>
+            <button
+              type="button"
+              class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
+              data-modal-hide="editProfileModal"
+            >
+              <svg
+                aria-hidden="true"
+                class="w-5 h-5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414 1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              <span class="sr-only">Close modal</span>
+            </button>
+          </div>
+          <div class="p-6 space-y-6">
+            <form id="editProfileForm">
+              <div class="mb-4">
+                <label
+                  for="editUsername"
+                  class="block text-sm font-medium text-gray-900 dark:text-gray-300"
+                  >Username</label
+                >
+                <input
+                  type="text"
+                  id="editUsername"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                  required
+                />
+              </div>
+              <div class="mb-4">
+                <label
+                  for="editEmail"
+                  class="block text-sm font-medium text-gray-900 dark:text-gray-300"
+                  >Email</label
+                >
+                <input
+                  type="email"
+                  id="editEmail"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                  required
+                />
+              </div>
+              <div class="mb-4">
+                <label
+                  for="editPassword"
+                  class="block text-sm font-medium text-gray-900 dark:text-gray-300"
+                  >Password</label
+                >
+                <input
+                  type="password"
+                  id="editPassword"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                  required
+                />
+              </div>
+              <div class="mb-4">
+                <label
+                  for="editMobile"
+                  class="block text-sm font-medium text-gray-900 dark:text-gray-300"
+                  >Mobile</label
+                >
+                <input
+                  type="tel"
+                  id="editMobile"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                  required
+                />
+              </div>
+            </form>
+          </div>
+          <div
+            class="flex items-center p-6 space-x-2 rounded-b border-t border-gray-200 dark:border-gray-600"
+          >
+            <button
+              id="save-changes-button"
+              data-modal-hide="editProfileModal"
+              type="button"
+              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              Save Changes
+            </button>
+            <button
+              id="cancel-changes-button"
+              data-modal-hide="editProfileModal"
+              type="button"
+              class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <script src="assets/logic/profile.js"></script>
+    <div id="footer-placeholder"></div>
+    <script src="/assets/Home/js/footer-loader.js"></script>
+    <script src="/assets/Home/js/navbar-loader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </body>
+</html>

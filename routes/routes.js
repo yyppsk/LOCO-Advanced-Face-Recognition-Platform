@@ -5,6 +5,7 @@ const router = express.Router();
 const pool = require("../db/db");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
+const bcrypt = require("bcrypt");
 
 const { getDescriptorsFromDB, uploadLabeledImages } = require("../utils/utils");
 
@@ -30,7 +31,7 @@ router.get("/fetchuserinfo", async (req, res) => {
   }
 });
 
-//FETCH USER INFO BY ID
+//FETCH LOST PERSON INFO BY ID
 router.get("/fetchUserInfobyid/:id", async (req, res) => {
   const personId = req.params.id;
 
@@ -162,6 +163,38 @@ router.delete("/persons/:id", async (req, res) => {
       success: false,
       message: "An error occurred while deleting the record",
     });
+  }
+});
+
+router.put("/updateuserinfo", async (req, res) => {
+  try {
+    const userId = req.session.user.user_id;
+    const { username, email, password, mobile } = req.body;
+
+    // Hash the new password before updating
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const query = `
+      UPDATE appuser
+      SET username = $1, email = $2, password = $3, mobile = $4
+      WHERE user_id = $5
+    `;
+    const values = [username, email, hashedPassword, mobile, userId];
+
+    await pool.query(query, values);
+
+    // Update the session user data to reflect changes
+    req.session.user.username = username;
+    req.session.user.email = email;
+    req.session.user.mobile = mobile;
+
+    res.json({
+      success: true,
+      message: "User information updated successfully",
+    });
+  } catch (error) {
+    console.error("Error updating user info:", error.message);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 

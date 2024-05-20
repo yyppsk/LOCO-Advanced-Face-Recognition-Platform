@@ -142,6 +142,10 @@ app.get("/login", (req, res) => {
   res.sendFile(__dirname + "/public/userauth.html");
 });
 
+app.get("/profile", isAuthenticated, (req, res) => {
+  res.sendFile(__dirname + "/public/profile.html");
+});
+
 app.get("/dashboard", isAuthenticated, (req, res) => {
   // Use path.join to construct the absolute path to your HTML file
   const dashboardPath = path.join(__dirname, "public", "dashboard.html");

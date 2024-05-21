@@ -42,15 +42,6 @@ function displayData(data) {
       <p class="text-pretty">City: ${person.city}</p>
       <p>Gender: ${person.gender}</p>
       <p>Reported at: ${readableDate}</p>
-      <br>
-      <div class="flex space-x-2">
-        <button class="edit-button flex items-center justify-center text-sm md:text-base text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700 mr-2 md:mr-4" onclick="openEditModal('${person.person_id}', '${person.name}', '${person.gender}', '${person.age}', '${person.city}', '${person.description}', '${person.reported_by}')">
-          <i class="fas fa-edit mr-1"></i> Edit
-        </button>
-        <button class="delete-button flex items-center justify-center text-sm md:text-base text-red-500 hover:text-red-700 focus:outline-none focus:text-red-700" onclick="openDeleteModal('${person.person_id}')">
-          <i class="fas fa-trash-alt mr-1"></i> Delete
-        </button>
-      </div>
       ${buttonHTML}
     `;
     gallery.appendChild(div);
